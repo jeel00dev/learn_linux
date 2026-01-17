@@ -286,3 +286,15 @@ Safe, auditable, and limited.
 | 1 (sticky) | Protect deletion  | /tmp, shared upload dirs |
 | 2 (setgid) | Group inheritance | Team projects            |
 | 4 (setuid) | Run as owner      | System binaries only     |
+
+# letter at the beginning of the permissions
+
+| Letter | Meaning           | Example               |
+| ------ | ----------------- | --------------------- |
+| `-`    | Regular file      | text file, binary     |
+| `d`    | Directory         | `/etc`, `/home`       |
+| `l`    | Symbolic link     | `stdout -> /proc/...` |
+| `b`    | Block device      | `sda`, `sda1`         |
+| `c`    | Character device  | `tty`, `tpm0`         |
+| `p`    | Named pipe (FIFO) | IPC pipes             |
+| `s`    | Socket            | Unix domain socket    |
