@@ -1,19 +1,18 @@
----
 # Linux Links: Hard Links and Symbolic (Soft) Links
 
 ## 1. Background: How files really work in Linux
 
 In Linux, a **file name is not the file itself**.
 
-* The actual file is represented by an **inode**
-* An inode stores:
+- The actual file is represented by an **inode**
+- An inode stores:
+  - permissions
+  - owner
+  - size
+  - timestamps
+  - pointers to data blocks
 
-  * permissions
-  * owner
-  * size
-  * timestamps
-  * pointers to data blocks
-* A **directory** is just a mapping:
+- A **directory** is just a mapping:
 
   ```
   filename → inode number
@@ -100,9 +99,9 @@ The inode is removed **only when link count becomes zero**.
 
 Hard links:
 
-- ❌ cannot link directories
-- ❌ cannot cross filesystems
-- ❌ cannot point to non-existing files
+- cannot link directories
+- cannot cross filesystems
+- cannot point to non-existing files
 
 ---
 
@@ -228,7 +227,7 @@ Correct:
 rm link.txt
 ```
 
-⚠️ Dangerous:
+Dangerous:
 
 ```bash
 rm link.txt/
