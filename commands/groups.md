@@ -1,43 +1,86 @@
-In linux every file or dir has 3 permission layers.
-owner | group | others
-ex.
-owner (jeel) → read + write
-group (devteam) → read only
-oReal-world analogy
+# Linux Groups and Permissions
+
+## Permission Layers
+
+In Linux, every file or directory has three permission layers:
+
+- **Owner**: The user who owns the file or directory.
+- **Group**: The group associated with the file or directory.
+- **Others**: All other users on the system.
+
+### Example
+
+- Owner (e.g., jeel) → read + write
+- Group (e.g., devteam) → read only
+- Others → no access
+
+## Real-World Analogy
 
 Think of a company:
-Users → employees
-Groups → teams (dev, ops, ml, finance)
-Files → shared resources
-Instead of:
-“Give Alice access, give Bob access, give Charlie access…”
-You say:
-“Anyone in the ml-team can access this folder.”
-That’s the entire purpose of groups.thers → no access
 
-list all the groups in the system
+- **Users** → Employees
+- **Groups** → Teams (e.g., dev, ops, ml, finance)
+- **Files** → Shared resources
+
+Instead of granting access individually (e.g., "Give Alice access, give Bob access, give Charlie access..."), you can grant access to the entire group (e.g., "Anyone in the ml-team can access this folder.").
+
+That's the primary purpose of groups.
+
+## Managing Groups
+
+### List All Groups in the System
+
+```bash
 cat /etc/group
+```
 
-create own group
-sudo groupadd (group_name)
+### Create a Group
 
-now append any user to that group
-sudo usermod -aG (group_name) (user_name)
-here -a mean append and -G means secondary group
+```bash
+sudo groupadd <group_name>
+```
 
-then apply changes with
-newgrp (group_name)
+### Add a User to a Group
 
-remove user from the group
-sudo gpasswd -d (user_name) (group_name)
+```bash
+sudo usermod -aG <group_name> <user_name>
+```
 
-destroy the group
-sudo groupdel (group_name)
+- `-a`: Append (add without removing existing groups).
+- `-G`: Secondary group.
 
-change group ownership of a file or dir
-sudo chgrp (group_name) (file or dir name)
-for directory add -R for recursive permission inside that dir
-sudo chgrp -R (group_name) (dir)
+### Apply Changes
 
-now also want to change owner and group then
-sudo chown (owner):(group) (file or dir)
+```bash
+newgrp <group_name>
+```
+
+### Remove a User from a Group
+
+```bash
+sudo gpasswd -d <user_name> <group_name>
+```
+
+### Delete a Group
+
+```bash
+sudo groupdel <group_name>
+```
+
+### Change Group Ownership of a File or Directory
+
+```bash
+sudo chgrp <group_name> <file_or_dir_name>
+```
+
+For directories, add `-R` for recursive changes:
+
+```bash
+sudo chgrp -R <group_name> <dir_name>
+```
+
+### Change Owner and Group
+
+```bash
+sudo chown <owner>:<group> <file_or_dir_name>
+```

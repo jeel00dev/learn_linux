@@ -1,115 +1,138 @@
-every file has 3 permission sets
-owner | group | others
-| Permission | Symbol | Meaning (file) | Meaning (directory) |
+# Linux Permissions and Chmod
+
+## Basic Permissions
+
+Every file or directory in Linux has three permission sets:
+
+- **Owner**: The user who owns the file.
+- **Group**: The group associated with the file.
+- **Others**: All other users.
+
+Permissions are represented as `rwx` for each set (e.g., `rwxr-x---` means owner has full access, group has read and execute, others have none).
+
+| Permission | Symbol | Meaning (File) | Meaning (Directory) |
 | ---------- | ------ | -------------- | ------------------- |
-| Read | `r` | read file | list files |
-| Write | `w` | modify file | create/delete files |
-| Execute | `x` | run file | enter directory |
+| Read       | `r`    | Read file      | List files          |
+| Write      | `w`    | Modify file    | Create/delete files |
+| Execute    | `x`    | Run file       | Enter directory     |
 
-- | rwx | r-x | ---
-  owner group others
+## Using Chmod
 
-there are two ways to use chmod
+There are two ways to use `chmod`:
 
-1. symbolic mode
-2. numeric mode
+1. **Symbolic Mode**
+2. **Numeric Mode**
 
-chmod [who][+|-|=][permissions] file
+### Symbolic Mode
 
-`+` means add - mean remove = mean set exactly same permission
-Who
-u → owner (user)
-g → group
-o → others
-a → all
+Syntax: `chmod [who][+|-|=][permissions] <file>`
 
-ex.
+- `+`: Add permission
+- `-`: Remove permission
+- `=`: Set exactly to these permissions
+
+Who:
+
+- `u`: Owner (user)
+- `g`: Group
+- `o`: Others
+- `a`: All
+
+Examples:
+
+```bash
 chmod u+x script.sh
 chmod g-w report.txt
 chmod u=rwx,g=rx,o= file.sh
+```
 
-2. numeric mode
+### Numeric Mode
 
-| Permission | Value       |
-| ---------- | ----------- |
-| r          | 4           |
-| w          | 2           |
-| x          | 1           |
-| Number     | Meaning     |
-| ------     | ----------- |
-| 7          | rwx (4+2+1) |
-| 6          | rw-         |
-| 5          | r-x         |
-| 4          | r--         |
-| 0          | ---         |
+| Permission | Value |
+| ---------- | ----- |
+| `r`        | 4     |
+| `w`        | 2     |
+| `x`        | 1     |
 
-chmod XYZ file
-X is owner
-Y is group
-Z is others
+| Number | Meaning       |
+| ------ | ------------- |
+| 7      | `rwx` (4+2+1) |
+| 6      | `rw-`         |
+| 5      | `r-x`         |
+| 4      | `r--`         |
+| 0      | `---`         |
 
-ex.
-chmod 750 deploy.sh is similar to rwxr-x---
-chmod 644 readme.md is similar to rw-r--r--
-chmod -R 770 project recursive permission (affects everything inside)
+Syntax: `chmod XYZ <file>`
 
-there is also an special bits
-[ special ][ owner ][ group ][ others ]
-| Bit | Name | Applies to |
+- `X`: Owner
+- `Y`: Group
+- `Z`: Others
+
+Examples:
+
+```bash
+chmod 750 deploy.sh  # Equivalent to rwxr-x---
+chmod 644 readme.md  # Equivalent to rw-r--r--
+chmod -R 770 project # Recursive (affects everything inside)
+```
+
+## Special Bits
+
+Permissions can include special bits at the beginning: `[special][owner][group][others]`.
+
+| Bit | Name   | Applies To          |
 | --- | ------ | ------------------- |
-| 4 | setuid | files |
-| 2 | setgid | files & directories |
-| 1 | sticky | directories |
-| Symbol | Meaning |
+| 4   | setuid | Files               |
+| 2   | setgid | Files & directories |
+| 1   | sticky | Directories         |
+
+| Symbol | Meaning                       |
 | ------ | ----------------------------- |
-| `s` | setuid or setgid + execute |
-| `S` | setuid/setgid without execute |
-| `t` | sticky + execute |
-| `T` | sticky without execute |
-| Feature | sticky (1) | setgid (2) |
-| -------------------------- | ------------------ | ------------------ |
-| Controls delete | ✅ | ❌ |
-| Controls group inheritance | ❌ | ✅ |
-| Allows creation | ❌ (depends on `w`) | ❌ (depends on `w`) |
-| Affects owner | ❌ | ❌ |
+| `s`    | setuid or setgid + execute    |
+| `S`    | setuid/setgid without execute |
+| `t`    | sticky + execute              |
+| `T`    | sticky without execute        |
 
-````
----
-
-## 1️⃣ Sticky Bit (`1`) — Delete Protection (Directories)
-
-### What it does
-
-> In a writable directory, **users can delete only their own files**, not others’.
-
-It **does NOT**:
-
-* change owner
-* change group
-* allow creation by itself
-* override read/write permissions
+| Feature                    | Sticky (1)          | Setgid (2)          |
+| -------------------------- | ------------------- | ------------------- |
+| Controls delete            | Yes                 | No                  |
+| Controls group inheritance | No                  | Yes                 |
+| Allows creation            | No (depends on `w`) | No (depends on `w`) |
+| Affects owner              | No                  | No                  |
 
 ---
 
-### Real-life example: `/tmp`
+## Sticky Bit (1) — Delete Protection (Directories)
+
+### What It Does
+
+In a writable directory, users can delete only their own files, not others'.
+
+It does **not**:
+
+- Change owner
+- Change group
+- Allow creation by itself
+- Override read/write permissions
+
+### Real-Life Example: /tmp
 
 ```bash
 ls -ld /tmp
-````
-
-```text
-drwxrwxrwt  root root /tmp
 ```
 
-- Everyone can create files (`rwx`)
-- Sticky bit (`t`) prevents users from deleting others’ files
+Output:
 
----
+```
+drwxrwxrwt root root /tmp
+```
 
-### Scenario (shared scratch space)
+- Everyone can create files (`rwx`).
+- Sticky bit (`t`) prevents users from deleting others' files.
 
-**Problem:**
-Multiple users share a directory. Anyone can delete anyone else’s files.
+### Scenario: Shared Scratch Space
+
+**Problem:** Multiple users share a directory, and anyone can delete anyone else's files.
 
 **Solution:**
 
@@ -119,37 +142,33 @@ chmod 1777 /shared
 
 **Result:**
 
-- Users can create files
-- Users can delete **only their own** files
-- Directory owner can delete anything
+- Users can create files.
+- Users can delete only their own files.
+- Directory owner can delete anything.
 
----
-
-### When to use sticky bit
+### When to Use Sticky Bit
 
 - `/tmp`-like shared directories
 - Public upload areas
 
-### When NOT to use
+### When Not to Use
 
 - Team project directories (use setgid instead)
 
 ---
 
-## 2️⃣ setgid (`2`) — Group Inheritance (Files & Directories)
+## Setgid (2) — Group Inheritance (Files & Directories)
 
-### What it does (most common use: directories)
+### What It Does (Most Common Use: Directories)
 
-> New files and directories **inherit the directory’s group**, not the user’s primary group.
+New files and directories inherit the directory's group, not the user's primary group.
 
-It **does NOT**:
+It does **not**:
 
-- change who owns the file (owner is always the creator)
-- allow creation by itself (needs `w`)
+- Change who owns the file (owner is always the creator).
+- Allow creation by itself (needs `w`).
 
----
-
-### Real-life example: Team project directory
+### Real-Life Example: Team Project Directory
 
 **Setup:**
 
@@ -161,13 +180,13 @@ chgrp devteam /srv/project
 chmod 2770 /srv/project
 ```
 
-```text
+Output:
+
+```
 drwxrws--- root devteam /srv/project
 ```
 
----
-
-### What happens now
+### What Happens Now
 
 | Creator | Owner | Group   |
 | ------- | ----- | ------- |
@@ -175,20 +194,13 @@ drwxrws--- root devteam /srv/project
 | chitu   | chitu | devteam |
 | alice   | alice | devteam |
 
-🔥 **Perfect collaboration**
-No more mixed groups like `jeel`, `chitu`, etc.
+Perfect for collaboration: No more mixed groups.
 
----
+### Setgid on Files (Rare)
 
-### setgid on files (rare)
+Program runs with the file's group permissions. Used occasionally for shared tools, but uncommon today.
 
-> Program runs with the file’s **group permissions**.
-
-Used occasionally for shared tools, but uncommon today.
-
----
-
-### When to use setgid
+### When to Use Setgid
 
 - Team/project directories
 - Shared workspaces
@@ -196,76 +208,70 @@ Used occasionally for shared tools, but uncommon today.
 
 ---
 
-## 4️⃣ setuid (`4`) — Run as Owner (Files Only)
+## Setuid (4) — Run as Owner (Files Only)
 
-### What it does
+### What It Does
 
-> When an executable runs, it runs **as the file’s owner**, not the user who launched it.
+When an executable runs, it runs as the file's owner, not the user who launched it.
 
-It **does NOT**:
+It does **not**:
 
-- ask for a password
-- change ownership
-- override execute permission
+- Ask for a password
+- Change ownership
+- Override execute permission
 
----
-
-### Real-life example: `passwd`
+### Real-Life Example: passwd
 
 ```bash
 ls -l /usr/bin/passwd
 ```
 
-```text
--rwsr-xr-x  root root /usr/bin/passwd
+Output:
+
+```
+-rwsr-xr-x root root /usr/bin/passwd
 ```
 
 - Owner: `root`
-- setuid enabled (`s`)
-- Any user running `passwd` temporarily runs it **as root**
+- Setuid enabled (`s`)
+- Any user running `passwd` temporarily runs it as root.
 
-**Why this exists:**
+**Why This Exists:**
 
-- Passwords are stored in `/etc/shadow` (root-only)
-- Users must change their own passwords
-- setuid provides **controlled privilege escalation**
+- Passwords are stored in `/etc/shadow` (root-only).
+- Users must change their own passwords.
+- Setuid provides controlled privilege escalation.
 
----
-
-### Numeric example
+### Numeric Example
 
 ```bash
 chmod 4755 program
 ```
 
-```
-4 → setuid
-7 → owner rwx
-5 → group r-x
-5 → others r-x
-```
+- 4 → setuid
+- 7 → owner rwx
+- 5 → group r-x
+- 5 → others r-x
 
----
+### Important Warning
 
-### ⚠️ VERY IMPORTANT WARNING
+- Setuid on custom programs is dangerous.
+- Bugs can lead to full root compromise.
+- Linux ignores setuid on scripts for safety.
 
-- setuid on custom programs is **dangerous**
-- Bugs = full root compromise
-- Linux ignores setuid on scripts for safety
+Do **not** use setuid to avoid sharing sudo passwords.
 
-👉 **Do NOT use setuid to avoid sharing sudo passwords**
+### Correct Alternative (Best Practice)
 
----
-
-### Correct alternative (best practice)
-
-Use **sudo rules** instead:
+Use sudo rules instead:
 
 ```bash
 sudo visudo
 ```
 
-```text
+Add:
+
+```
 %devteam ALL=(root) NOPASSWD: /usr/bin/systemctl restart myservice
 ```
 
@@ -273,12 +279,10 @@ Safe, auditable, and limited.
 
 ---
 
-## Side-by-side comparison
+## Side-by-Side Comparison
 
-| Bit        | Purpose           | Typical Use                |
-| ---------- | ----------------- | -------------------------- |
-| 1 (sticky) | protect deletion  | `/tmp`, shared upload dirs |
-| 2 (setgid) | group inheritance | team projects              |
-| 4 (setuid) | run as owner      | system binaries only       |
-
----
+| Bit        | Purpose           | Typical Use              |
+| ---------- | ----------------- | ------------------------ |
+| 1 (sticky) | Protect deletion  | /tmp, shared upload dirs |
+| 2 (setgid) | Group inheritance | Team projects            |
+| 4 (setuid) | Run as owner      | System binaries only     |

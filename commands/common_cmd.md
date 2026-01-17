@@ -1,14 +1,42 @@
-lsblk
-list all the partitions connected to the system.
+# Disk Management Commands
 
-mount
-linux doesn't auto-use disks.we have to mount them into the directory tree.
-ex.
+## lsblk
+
+Lists all the partitions connected to the system.
+
+Example:
+
+```bash
+lsblk
+```
+
+## mount
+
+Linux does not automatically use disks; you have to mount them into the directory tree.
+
+Example:
+
+```bash
 sudo mkdir /mnt/usb
 sudo mount /dev/sdb1 /mnt/usb
+```
 
-umount to deatach a filesystem.
-ex.
+## umount
+
+Detaches a filesystem.
+
+Example:
+
+```bash
 sudo umount /mnt/usb
+```
 
-df -h shows used & available spaces.(only for Mounted)
+## df
+
+Shows used and available space (only for mounted filesystems). Use `-h` for human-readable format.
+
+Example:
+
+```bash
+df -h
+```
